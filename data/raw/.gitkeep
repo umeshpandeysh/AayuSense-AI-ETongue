@@ -1,0 +1,2 @@
+# Place raw sensor CSV files here
+# Format: timestamp, ph, conductivity, turbidity, orp, quality_label
