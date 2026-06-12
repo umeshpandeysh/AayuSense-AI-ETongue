@@ -70,8 +70,8 @@ def compute_range_features(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     """
     for col in SENSOR_COLUMNS:
         df[f"{col}_range"] = (
-            df[col].rolling(window=window, min_periods=1).max() -
-            df[col].rolling(window=window, min_periods=1).min()
+            df[col].rolling(window=window, min_periods=1).max()
+            - df[col].rolling(window=window, min_periods=1).min()
         )
     return df
 
@@ -165,10 +165,10 @@ def compute_adulteration_score(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Weights reflect AayuSense SHAP analysis: Salt_content and TDS most impactful
     df["adulteration_heuristic"] = (
-        0.40 * df["Salt_content"] +
-        0.30 * df["TDS"] +
-        0.20 * df["Reduction_value"] +
-        0.10 * (1 - df["pH"] / 14)
+        0.40 * df["Salt_content"]
+        + 0.30 * df["TDS"]
+        + 0.20 * df["Reduction_value"]
+        + 0.10 * (1 - df["pH"] / 14)
     ).clip(0, 1)
     return df
 

@@ -8,7 +8,7 @@ The AayuSense ESP32 firmware sends JSON over serial/MQTT with all 8 sensor readi
 
 import json
 import logging
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any
 
@@ -16,15 +16,16 @@ logger = logging.getLogger(__name__)
 
 # Sensor valid ranges from AayuSense hardware calibration
 SENSOR_RANGES: Dict[str, tuple] = {
-    "pH":              (0.0,  14.0),
-    "TDS":             (0.0,  1000.0),
-    "orp_mV":          (-500.0, 500.0),
-    "turbidity":       (0.0,  1.0),
-    "Reduction_value": (0.0,  1.0),
-    "Ionic_value":     (0.0,  1.0),
-    "Salt_content":    (0.0,  1.0),
-    "temp_c":          (15.0, 45.0),
+    "pH": (0.0, 14.0),
+    "TDS": (0.0, 1000.0),
+    "orp_mV": (-500.0, 500.0),
+    "turbidity": (0.0, 1.0),
+    "Reduction_value": (0.0, 1.0),
+    "Ionic_value": (0.0, 1.0),
+    "Salt_content": (0.0, 1.0),
+    "temp_c": (15.0, 45.0),
 }
+
 
 @dataclass
 class SensorReading:
@@ -40,9 +41,9 @@ class SensorReading:
     Ionic_value: float
     Salt_content: float
     temp_c: float
-    herb_name:       Optional[str] = None
-    operator:        Optional[str] = None
-    notes:           Optional[str] = None
+    herb_name: Optional[str] = None
+    operator: Optional[str] = None
+    notes: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
