@@ -2,46 +2,41 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.3+-F7931E?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
-[![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-0073B7?style=flat&logo=python&logoColor=white)](https://xgboost.readthedocs.io)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-0073B7?style=flat)](https://xgboost.readthedocs.io)
+[![SHAP](https://img.shields.io/badge/SHAP-Explainability-blueviolet?style=flat)](https://shap.readthedocs.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![SIH 2025](https://img.shields.io/badge/Smart%20India%20Hackathon-2025%20Qualifier-orange?style=flat)](https://www.sih.gov.in/)
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-aayu--sense.vercel.app-brightgreen?style=flat&logo=vercel)](https://aayu-sense.vercel.app)
 
-> **SIH 2025 Qualifier Project** — An AI-driven Electronic Tongue (E-Tongue) system that uses multi-sensor arrays and machine learning to detect adulteration and assess quality in herbal samples.
+> **SIH 2025 Qualifier** — The Python ML backend for AayuSense, a collaborative AI-driven Electronic Tongue (E-Tongue) system for herbal quality assessment and adulteration detection.
+>
+> 🌐 **Live web dashboard:** [aayu-sense.vercel.app](https://aayu-sense.vercel.app) · **Web app repo:** [Swayam-jhaa/AayuSense](https://github.com/Swayam-jhaa/AayuSense)
 
 ---
 
 ## 📋 Table of Contents
-
-- [Problem Statement](#problem-statement)
-- [Motivation](#motivation)
+- [Project Overview](#project-overview)
 - [System Architecture](#system-architecture)
-- [Sensor Pipeline](#sensor-pipeline)
-- [Data Processing Workflow](#data-processing-workflow)
-- [Feature Engineering](#feature-engineering)
-- [Machine Learning Workflow](#machine-learning-workflow)
-- [Dashboard Overview](#dashboard-overview)
+- [Hardware — ESP32 Sensor Array](#hardware--esp32-sensor-array)
+- [Rasa Profiling](#rasa-profiling)
+- [ML Pipeline](#ml-pipeline)
+- [SHAP Explainability](#shap-explainability)
 - [Project Structure](#project-structure)
 - [Setup & Installation](#setup--installation)
-- [Future Scope](#future-scope)
-- [Roadmap](#roadmap)
-- [Technologies Used](#technologies-used)
+- [Quick Start](#quick-start)
+- [Data Flow](#data-flow)
+- [Team](#team)
 
 ---
 
-## 🎯 Problem Statement
+## 🎯 Project Overview
 
-The global herbal medicine market suffers from widespread adulteration and quality inconsistency. Traditional quality testing methods are:
-- **Expensive** — requiring laboratory equipment and trained chemists
-- **Slow** — results take days to weeks
-- **Inaccessible** — not available at point-of-sale or field locations
+The global herbal medicine market suffers from widespread adulteration. Traditional quality testing requires expensive lab equipment and trained chemists, making it inaccessible at point-of-sale or field locations.
 
-AayuSense addresses this by providing a **low-cost, real-time, AI-powered quality assessment system** deployable in field conditions.
-
----
-
-## 💡 Motivation
-
-Herbal products are increasingly consumed globally for wellness and therapeutic purposes. Adulteration with inferior substitutes poses both health risks and economic harm to consumers. The vision of AayuSense is to democratize quality testing by embedding intelligence directly into affordable sensor hardware.
+**AayuSense** addresses this with a two-part system:
+1. **Hardware layer** — ESP32 microcontroller with an 8-sensor electrochemical array
+2. **ML layer** (this repo) — Python pipeline that classifies sensor readings as genuine or adulterated, with Rasa profiling and SHAP explainability
+3. **Web layer** — Next.js dashboard at [aayu-sense.vercel.app](https://aayu-sense.vercel.app) that surfaces results
 
 ---
 
@@ -49,109 +44,120 @@ Herbal products are increasingly consumed globally for wellness and therapeutic 
 
 ```mermaid
 graph TD
-    A[Herbal Sample] --> B[Sensor Array]
-    B --> B1[pH Sensor]
-    B --> B2[Conductivity Sensor]
-    B --> B3[Turbidity Sensor]
-    B --> B4[ORP Sensor]
-    B1 & B2 & B3 & B4 --> C[Data Acquisition Module]
-    C --> D[Automated Data Pipeline]
-    D --> E[Feature Engineering]
-    E --> F[ML Classification Engine]
-    F --> F1[Random Forest Classifier]
-    F --> F2[XGBoost Classifier]
-    F1 & F2 --> G[Model Evaluation & Selection]
-    G --> H[Real-Time Dashboard]
-    H --> I[Quality Assessment Output]
-    I --> I1[Genuine / Adulterated]
-    I --> I2[Adulteration Type]
+    A[Herbal Sample] --> B[ESP32 Device]
+    B --> B1[pH Electrode]
+    B --> B2[TDS Sensor]
+    B --> B3[ORP Probe]
+    B --> B4[Turbidity Sensor]
+    B --> B5[Reduction Sensor]
+    B --> B6[Ionic Sensor]
+    B --> B7[Salt Content Sensor]
+    B --> B8[Temperature Probe]
+    B1 & B2 & B3 & B4 & B5 & B6 & B7 & B8 --> C[ESP32 JSON Payload]
+    C --> D[esp32_interface.py]
+    D --> E[data_pipeline.py]
+    E --> F[feature_engineering.py]
+    F --> F1[8-Sensor Features]
+    F --> F2[Rasa Intensity Profiles]
+    F --> F3[Interaction Features]
+    F1 & F2 & F3 --> G[ML Classifiers]
+    G --> G1[Random Forest]
+    G --> G2[XGBoost]
+    G1 & G2 --> H[explainability.py]
+    H --> I[SHAP Feature Impact]
+    G1 & G2 & I --> J[AayuSense Web Dashboard]
+    J --> K[Quality Report]
 ```
 
 ---
 
-## 🔬 Sensor Pipeline
+## 🔬 Hardware — ESP32 Sensor Array
 
-The E-Tongue system uses a multi-parameter electrochemical sensor array:
+The AayuSense device uses an ESP32 microcontroller with 8 sensor channels:
 
-| Sensor | Parameter | Unit | Role |
+| Sensor | Field Name | Unit | Role |
 |--------|-----------|------|------|
-| pH Electrode | Acidity/Basicity | pH units | Chemical composition indicator |
-| Conductivity Probe | Ionic concentration | mS/cm | Dissolved solids detection |
-| Turbidity Sensor | Optical clarity | NTU | Particulate matter analysis |
-| ORP Sensor | Oxidation-Reduction Potential | mV | Redox activity profiling |
+| pH Electrode | `pH` | 0–14 | Acidity/basicity profile |
+| TDS Probe | `TDS` | ppm | Total Dissolved Solids |
+| ORP Sensor | `orp_mV` | mV | Oxidation-Reduction Potential |
+| Turbidity Sensor | `turbidity` | 0–1 | Optical clarity (normalized) |
+| Reduction Sensor | `Reduction_value` | 0–1 | Reduction activity |
+| Ionic Sensor | `Ionic_value` | 0–1 | Ionic concentration |
+| Salt Content | `Salt_content` | 0–1 | Salt loading index |
+| Temperature | `temp_c` | °C | Ambient/solution temperature |
 
-Data is collected via an **automated acquisition pipeline** that samples readings at configurable intervals, timestamps each record, and writes structured CSV output for downstream ML processing.
-
----
-
-## 📊 Data Processing Workflow
-
-```mermaid
-flowchart LR
-    A[Raw Sensor CSV] --> B[Data Loading & Validation]
-    B --> C[Missing Value Handling]
-    C --> D[Outlier Detection & Removal]
-    D --> E[Normalization / Scaling]
-    E --> F[Exploratory Data Analysis]
-    F --> G[ML-Ready Dataset]
+**ESP32 JSON payload format** (sent by firmware):
+```json
+{
+  "sample_id": "S20250916-01",
+  "device_id": "ESP32-01",
+  "timestamp": "2025-09-16T09:12:00Z",
+  "sensors": {
+    "pH": 6.1, "TDS": 210, "orp_mV": 345,
+    "turbidity": 0.14, "Reduction_value": 0.120,
+    "Ionic_value": 0.080, "Salt_content": 0.220,
+    "temp_c": 25.2
+  },
+  "herb_name": "Neem (Azadirachta indica)",
+  "operator": "Umesh"
+}
 ```
 
-**EDA Steps Performed:**
-- Distribution analysis for each sensor channel
-- Correlation matrix to identify feature relationships
-- Class distribution inspection for adulteration categories
-- Temporal drift analysis across acquisition sessions
+---
+
+## 🪷 Rasa Profiling
+
+One of AayuSense's unique contributions is **Rasa profiling** — mapping electrochemical sensor readings to the six Ayurvedic taste categories (Rasas) that characterise herbal quality in traditional Indian medicine:
+
+| Rasa | English | Key Sensor Correlates |
+|------|---------|----------------------|
+| Madhura | Sweet | Low pH, moderate TDS, low ORP |
+| Amla | Sour | Low pH, high ORP |
+| Lavana | Salty | High TDS, Salt_content, Ionic_value |
+| Tikta | Bitter | High ORP, high Reduction_value |
+| Katu | Pungent | High ORP, reduction, temperature |
+| Kashaya | Astringent | High Ionic_value, Reduction_value |
+
+See [`docs/rasa_profiling.md`](docs/rasa_profiling.md) for methodology.
 
 ---
 
-## ⚙️ Feature Engineering
-
-Features engineered from raw sensor readings:
-
-| Feature | Description |
-|---------|-------------|
-| `ph_mean`, `ph_std` | Rolling statistics on pH channel |
-| `conductivity_range` | Max - Min conductivity in window |
-| `turbidity_gradient` | Rate of change of turbidity |
-| `orp_baseline_delta` | Deviation from clean sample baseline |
-| `sensor_cross_ratio` | pH × conductivity interaction term |
-
----
-
-## 🤖 Machine Learning Workflow
+## 🤖 ML Pipeline
 
 ```mermaid
 flowchart TD
-    A[Feature Matrix] --> B[Train / Test Split 80-20]
-    B --> C[k-Fold Cross-Validation k=5]
-    C --> D1[Random Forest Classifier]
-    C --> D2[XGBoost Classifier]
-    D1 --> E[Hyperparameter Tuning GridSearchCV]
-    D2 --> E
-    E --> F[Model Evaluation]
-    F --> F1[Precision]
-    F --> F2[Recall]
-    F --> F3[F1-Score]
-    F --> F4[Confusion Matrix]
-    F1 & F2 & F3 & F4 --> G[Best Model Selection]
-    G --> H[Serialized Model .pkl]
+    A[8-Sensor Feature Matrix] --> B[Train / Test Split 80-20]
+    B --> C[Stratified 5-Fold CV]
+    C --> D1[Random Forest + GridSearchCV]
+    C --> D2[XGBoost + GridSearchCV]
+    D1 & D2 --> E[Evaluation]
+    E --> E1[Precision · Recall · F1]
+    E --> E2[Confusion Matrix]
+    E --> E3[SHAP Analysis]
+    E3 --> F[Best Model Serialized]
 ```
 
-**Classification Task**: Multi-class detection of adulteration categories (genuine vs. adulterant type A, B, C...)
+**Herbs in dataset:**
+- Neem (Azadirachta indica)
+- Turmeric (Curcuma longa)
+- Ashwagandha (Withania somnifera)
 
-**Evaluation Metrics Used**: Precision · Recall · F1-Score · Confusion Matrix · Cross-validation scores
+**Classification task:** Binary — Genuine vs. Adulterated (probability score 0.0–1.0, threshold 0.5)
 
 ---
 
-## 📈 Dashboard Overview
+## 🔍 SHAP Explainability
 
-A real-time analytics dashboard surfaces:
-- **Live sensor readings** with time-series plots
-- **Classification output** — sample identity and confidence
-- **Historical log** of all tested samples
-- **Alert system** for detected adulteration events
+Every prediction includes a SHAP-based explanation identifying the most influential sensors. This matches the feature impact view in the AayuSense web dashboard:
 
-The dashboard is built with Python (Streamlit/Matplotlib) and provides a clean interface for non-technical operators.
+```python
+from src.explainability import AayuSenseExplainer
+explainer = AayuSenseExplainer(model, feature_names)
+explainer.fit(X_train)
+shap_values = explainer.compute_shap_values(X_test)
+top_features = explainer.get_top_features(shap_values, class_index=0, k=3)
+# [{"feature": "Salt_content", "impact": 0.38}, ...]
+```
 
 ---
 
@@ -161,24 +167,35 @@ The dashboard is built with Python (Streamlit/Matplotlib) and provides a clean i
 AayuSense-AI-ETongue/
 ├── README.md
 ├── requirements.txt
+├── config/
+│   └── model_config.yaml        # Training hyperparameter config
 ├── data/
-│   ├── raw/                    # Raw sensor CSV files (add your data here)
-│   └── processed/              # Cleaned, ML-ready datasets
-├── models/                     # Trained model files (.pkl)
+│   ├── raw/                     # ESP32 sensor CSV exports
+│   └── processed/               # Cleaned, feature-engineered datasets
+├── models/                      # Trained model files (.pkl / .joblib)
 ├── notebooks/
-│   └── 01_eda_and_feature_engineering.ipynb
+│   ├── 01_eda_and_feature_engineering.ipynb
+│   └── 02_model_training_evaluation.ipynb
 ├── src/
-│   ├── data_pipeline.py        # Sensor data loading & preprocessing
-│   ├── feature_engineering.py  # Feature extraction functions
-│   └── train_evaluate.py       # Model training & evaluation
+│   ├── esp32_interface.py       # ESP32 JSON payload parser & validator
+│   ├── data_pipeline.py         # 8-sensor data loading & preprocessing
+│   ├── feature_engineering.py   # Features + Rasa profiling
+│   ├── sensor_simulator.py      # Synthetic data generator (dev/testing)
+│   ├── train_evaluate.py        # RF + XGBoost training pipeline
+│   ├── predict.py               # Inference script (CLI & API)
+│   └── explainability.py        # SHAP-based model explainability
 ├── dashboard/
-│   └── app.py                  # Real-time dashboard application
-├── hardware/
-│   └── sensor_setup.md         # Hardware wiring & calibration guide
-├── images/
-│   └── (architecture diagrams, screenshots)
-└── docs/
-    └── architecture.md         # Detailed system documentation
+│   └── app.py                   # Streamlit dev dashboard
+├── docs/
+│   ├── integration.md           # ESP32 ↔ Python ↔ Web app data flow
+│   ├── hardware.md              # ESP32 sensor wiring & calibration
+│   ├── rasa_profiling.md        # Ayurvedic Rasa methodology
+│   └── api_reference.md         # Module API reference
+├── tests/
+│   ├── test_data_pipeline.py
+│   └── test_feature_engineering.py
+└── .github/
+    └── workflows/ci.yml
 ```
 
 ---
@@ -196,59 +213,98 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Run EDA notebook
-jupyter notebook notebooks/01_eda_and_feature_engineering.ipynb
+---
 
-# Train models
+## ⚡ Quick Start
+
+```python
+# 1. Parse a real ESP32 payload
+from src.esp32_interface import ESP32DataParser
+parser = ESP32DataParser()
+reading = parser.parse(esp32_json_string)
+print(reading.sensor_vector())
+
+# 2. Run preprocessing
+from src.data_pipeline import preprocess_pipeline
+df = preprocess_pipeline("data/raw/sample_sensor_data.csv")
+
+# 3. Extract features (includes Rasa profiling)
+from src.feature_engineering import extract_features
+features = extract_features(df)
+
+# 4. Train models
 python src/train_evaluate.py
 
-# Launch dashboard
+# 5. Launch dev dashboard
 streamlit run dashboard/app.py
+```
+
+---
+
+## 🔄 Data Flow
+
+```
+ESP32 Device
+    │
+    │  JSON over Serial / MQTT
+    ▼
+esp32_interface.py  ←→  SensorReading dataclass
+    │
+    ▼
+data_pipeline.py    ←→  validate → clean → normalize
+    │
+    ▼
+feature_engineering.py  ←→  8-sensor features + Rasa profiles + interactions
+    │
+    ▼
+train_evaluate.py   ←→  RandomForest / XGBoost / GridSearchCV
+    │
+    ▼
+explainability.py   ←→  SHAP TreeExplainer → top feature impacts
+    │
+    ▼
+AayuSense Web Dashboard (aayu-sense.vercel.app)
 ```
 
 ---
 
 ## 🔭 Future Scope
 
-- [ ] Expand sensor array with gas sensors and electronic nose (E-Nose) fusion
-- [ ] Deploy lightweight model on microcontroller (Arduino / Raspberry Pi)
-- [ ] Build mobile application for field operator use
-- [ ] Collect larger, certified dataset for production-grade accuracy
-- [ ] Explore deep learning (LSTM) for temporal sensor pattern recognition
-- [ ] Add explainability layer (SHAP values) for audit-ready reports
-
----
-
-## 🗺️ Roadmap
-
-| Phase | Status | Description |
-|-------|--------|-------------|
-| Phase 1: Sensor Integration | ✅ Complete | Hardware setup, automated data acquisition |
-| Phase 2: ML Pipeline | ✅ Complete | Feature engineering, RF & XGBoost training |
-| Phase 3: Dashboard | ✅ Complete | Real-time classification dashboard |
-| Phase 4: SIH 2025 | ✅ Qualified | Project selected for Smart India Hackathon |
-| Phase 5: Edge Deployment | 🔄 In Progress | Microcontroller deployment |
-| Phase 6: Mobile App | 📋 Planned | Android/iOS operator interface |
-
----
-
-## 🛠️ Technologies Used
-
-| Category | Tools |
-|----------|-------|
-| **Language** | Python 3.10+ |
-| **ML** | Scikit-learn, XGBoost, Random Forest |
-| **Data** | Pandas, NumPy, Matplotlib, Seaborn |
-| **Dashboard** | Streamlit, Matplotlib |
-| **Hardware** | pH/Conductivity/Turbidity/ORP sensors, Arduino/Raspberry Pi |
-| **Other** | Jupyter, GridSearchCV, k-Fold CV |
+- [ ] Real-time MQTT streaming from ESP32 to Python pipeline
+- [ ] Edge deployment: quantized model on ESP32 or Raspberry Pi
+- [ ] Expand herb library with certified reference samples
+- [ ] LSTM-based temporal pattern recognition across multiple scans
+- [ ] Integration with FSSAI herbal adulteration database
 
 ---
 
 ## 🏆 Achievement
 
 This project **qualified for Smart India Hackathon (SIH) 2025** — a national-level innovation competition organized by the Government of India.
+
+---
+
+## 👥 Team
+
+AayuSense is a collaborative project. The web dashboard and ESP32 firmware were developed together with the team.
+
+- **Umesh Pandey** — ML backend, feature engineering, model training (this repo)
+- **Swayam Jha** and collaborators — Next.js web dashboard, ESP32 firmware ([AayuSense repo](https://github.com/Swayam-jhaa/AayuSense))
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| ML | Scikit-learn, XGBoost, SHAP |
+| Data | Pandas, NumPy, SciPy |
+| Dashboard (dev) | Streamlit |
+| Web Dashboard | Next.js, TypeScript, Vercel |
+| Hardware | ESP32, 8-sensor electrochemical array |
+| CI | GitHub Actions |
 
 ---
 
@@ -260,6 +316,8 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-**AayuSense** | Built with ❤️ by [Umesh Pandey](https://github.com/umeshpandeysh)
+**AayuSense ML Backend** · Built with ❤️ as part of the AayuSense project
+
+[aayu-sense.vercel.app](https://aayu-sense.vercel.app) · [Swayam-jhaa/AayuSense](https://github.com/Swayam-jhaa/AayuSense)
 
 </div>
