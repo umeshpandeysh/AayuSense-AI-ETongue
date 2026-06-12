@@ -9,7 +9,6 @@ taste categories (Rasas) used in traditional herbal assessment.
 """
 
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -31,12 +30,12 @@ SENSOR_COLUMNS = [
 # Katu (pungent) -> high orp, high reduction, elevated temp
 # Kashaya (astringent) -> high ionic, moderate turbidity, high reduction
 RASA_WEIGHTS = {
-    "Madhura":  {"pH": +0.35, "TDS": +0.20, "orp_mV": -0.25, "Salt_content": +0.10, "turbidity": +0.10},
-    "Amla":     {"pH": -0.50, "orp_mV": +0.30, "Reduction_value": +0.20},
-    "Lavana":   {"TDS": +0.40, "Salt_content": +0.35, "Ionic_value": +0.25},
-    "Tikta":    {"orp_mV": +0.35, "Reduction_value": +0.30, "turbidity": -0.20, "temp_c": +0.15},
-    "Katu":     {"orp_mV": +0.30, "Reduction_value": +0.25, "temp_c": +0.30, "pH": -0.15},
-    "Kashaya":  {"Ionic_value": +0.40, "turbidity": +0.25, "Reduction_value": +0.25, "TDS": +0.10},
+    "Madhura": {"pH": +0.35, "TDS": +0.20, "orp_mV": -0.25, "Salt_content": +0.10, "turbidity": +0.10},
+    "Amla": {"pH": -0.50, "orp_mV": +0.30, "Reduction_value": +0.20},
+    "Lavana": {"TDS": +0.40, "Salt_content": +0.35, "Ionic_value": +0.25},
+    "Tikta": {"orp_mV": +0.35, "Reduction_value": +0.30, "turbidity": -0.20, "temp_c": +0.15},
+    "Katu": {"orp_mV": +0.30, "Reduction_value": +0.25, "temp_c": +0.30, "pH": -0.15},
+    "Kashaya": {"Ionic_value": +0.40, "turbidity": +0.25, "Reduction_value": +0.25, "TDS": +0.10},
 }
 
 
@@ -71,8 +70,8 @@ def compute_range_features(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     """
     for col in SENSOR_COLUMNS:
         df[f"{col}_range"] = (
-            df[col].rolling(window=window, min_periods=1).max()
-            - df[col].rolling(window=window, min_periods=1).min()
+            df[col].rolling(window=window, min_periods=1).max() -
+            df[col].rolling(window=window, min_periods=1).min()
         )
     return df
 
@@ -108,11 +107,11 @@ def compute_interaction_features(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame with interaction features.
     """
-    df["pH_TDS_product"]          = df["pH"] * df["TDS"]
+    df["pH_TDS_product"] = df["pH"] * df["TDS"]
     df["orp_reduction_composite"] = df["orp_mV"] * df["Reduction_value"]
-    df["electrolyte_index"]       = df["Ionic_value"] * df["Salt_content"]
-    df["pH_conductivity_ratio"]   = df["pH"] / (df["TDS"] + 1e-6)
-    df["sensor_energy"]           = (df[SENSOR_COLUMNS] ** 2).sum(axis=1)
+    df["electrolyte_index"] = df["Ionic_value"] * df["Salt_content"]
+    df["pH_conductivity_ratio"] = df["pH"] / (df["TDS"] + 1e-6)
+    df["sensor_energy"] = (df[SENSOR_COLUMNS] ** 2).sum(axis=1)
     return df
 
 
@@ -166,10 +165,10 @@ def compute_adulteration_score(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Weights reflect AayuSense SHAP analysis: Salt_content and TDS most impactful
     df["adulteration_heuristic"] = (
-        0.40 * df["Salt_content"]
-        + 0.30 * df["TDS"]
-        + 0.20 * df["Reduction_value"]
-        + 0.10 * (1 - df["pH"] / 14)
+        0.40 * df["Salt_content"] +
+        0.30 * df["TDS"] +
+        0.20 * df["Reduction_value"] +
+        0.10 * (1 - df["pH"] / 14)
     ).clip(0, 1)
     return df
 

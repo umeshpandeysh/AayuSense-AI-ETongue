@@ -29,17 +29,17 @@ SENSOR_RANGES: Dict[str, tuple] = {
 @dataclass
 class SensorReading:
     """Structured representation of one ESP32 sensor reading."""
-    sample_id:       str
-    device_id:       str
-    timestamp:       str
-    pH:              float
-    TDS:             float
-    orp_mV:          float
-    turbidity:       float
+    sample_id: str
+    device_id: str
+    timestamp: str
+    pH: float
+    TDS: float
+    orp_mV: float
+    turbidity: float
     Reduction_value: float
-    Ionic_value:     float
-    Salt_content:    float
-    temp_c:          float
+    Ionic_value: float
+    Salt_content: float
+    temp_c: float
     herb_name:       Optional[str] = None
     operator:        Optional[str] = None
     notes:           Optional[str] = None
@@ -50,14 +50,14 @@ class SensorReading:
     def sensor_vector(self) -> Dict[str, float]:
         """Return only numeric sensor values as dict."""
         return {
-            "pH":              self.pH,
-            "TDS":             self.TDS,
-            "orp_mV":          self.orp_mV,
-            "turbidity":       self.turbidity,
+            "pH": self.pH,
+            "TDS": self.TDS,
+            "orp_mV": self.orp_mV,
+            "turbidity": self.turbidity,
             "Reduction_value": self.Reduction_value,
-            "Ionic_value":     self.Ionic_value,
-            "Salt_content":    self.Salt_content,
-            "temp_c":          self.temp_c,
+            "Ionic_value": self.Ionic_value,
+            "Salt_content": self.Salt_content,
+            "temp_c": self.temp_c,
         }
 
 

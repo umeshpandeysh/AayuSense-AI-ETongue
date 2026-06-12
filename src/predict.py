@@ -1,6 +1,5 @@
 """Inference script for AayuSense E-Tongue quality classification."""
 import argparse
-import logging
 import pathlib
 import sys
 from typing import Any, Dict, List, Optional
@@ -40,7 +39,7 @@ def load_model_and_encoder(model_path: str, encoder_path: str):
     for p in (model_path, encoder_path):
         if not pathlib.Path(p).exists():
             raise FileNotFoundError(f"Required file not found: '{p}'")
-    model   = joblib.load(model_path)
+    model = joblib.load(model_path)
     encoder = joblib.load(encoder_path)
     logger.info("Model loaded from '%s'.", model_path)
     logger.info("Encoder loaded from '%s'.", encoder_path)
@@ -86,7 +85,7 @@ def predict_single_reading(
     """
     X = _engineer_features(ph, conductivity, turbidity, orp)
     proba = model.predict_proba(X)[0]
-    idx   = int(np.argmax(proba))
+    idx = int(np.argmax(proba))
     label = encoder.inverse_transform([idx])[0]
     confidence = float(proba[idx])
     class_labels = encoder.inverse_transform(list(range(len(proba))))
@@ -137,13 +136,13 @@ def predict_from_csv(
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description='AayuSense — herbal quality prediction CLI.')
-    p.add_argument('--model',         required=True,  help='Path to joblib model.')
-    p.add_argument('--encoder',       required=True,  help='Path to joblib LabelEncoder.')
-    p.add_argument('--ph',            type=float,     help='pH reading.')
-    p.add_argument('--conductivity',  type=float,     help='Conductivity (mS/cm).')
-    p.add_argument('--turbidity',     type=float,     help='Turbidity (NTU).')
-    p.add_argument('--orp',           type=float,     help='ORP (mV).')
-    p.add_argument('--csv',                           help='CSV file for batch prediction.')
+    p.add_argument('--model', required=True, help='Path to joblib model.')
+    p.add_argument('--encoder', required=True, help='Path to joblib LabelEncoder.')
+    p.add_argument('--ph', type=float, help='pH reading.')
+    p.add_argument('--conductivity', type=float, help='Conductivity (mS/cm).')
+    p.add_argument('--turbidity', type=float, help='Turbidity (NTU).')
+    p.add_argument('--orp', type=float, help='ORP (mV).')
+    p.add_argument('--csv', help='CSV file for batch prediction.')
     return p.parse_args()
 
 

@@ -69,8 +69,8 @@ class XGBoostModel:
             raise ImportError("Install xgboost: pip install xgboost")
 
         param_grid = {
-            'n_estimators':  self.config.xgb_n_estimators_range,
-            'max_depth':     self.config.xgb_max_depth_range,
+            'n_estimators': self.config.xgb_n_estimators_range,
+            'max_depth': self.config.xgb_max_depth_range,
             'learning_rate': self.config.xgb_lr_range,
         }
         logger.info("GridSearchCV for XGBoost — param_grid: %s", param_grid)

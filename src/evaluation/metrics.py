@@ -35,10 +35,10 @@ def evaluate_classifier(
     y_pred = model.predict(X_test)
     results = {
         'model_name': type(model).__name__,
-        'accuracy':   round(accuracy_score(y_test, y_pred), 4),
-        'precision':  round(precision_score(y_test, y_pred, average='weighted', zero_division=0), 4),
-        'recall':     round(recall_score(y_test, y_pred, average='weighted', zero_division=0), 4),
-        'f1':         round(f1_score(y_test, y_pred, average='weighted', zero_division=0), 4),
+        'accuracy': round(accuracy_score(y_test, y_pred), 4),
+        'precision': round(precision_score(y_test, y_pred, average='weighted', zero_division=0), 4),
+        'recall': round(recall_score(y_test, y_pred, average='weighted', zero_division=0), 4),
+        'f1': round(f1_score(y_test, y_pred, average='weighted', zero_division=0), 4),
         'classification_report': classification_report(
             y_test, y_pred, target_names=label_names, zero_division=0
         ),
@@ -67,18 +67,18 @@ def cross_validate_model(
         Dict with mean_accuracy, std_accuracy, mean_f1, std_f1.
     """
     cv = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=42)
-    acc = cross_val_score(model, X, y, cv=cv, scoring='accuracy',    n_jobs=-1)
-    f1  = cross_val_score(model, X, y, cv=cv, scoring='f1_weighted', n_jobs=-1)
+    acc = cross_val_score(model, X, y, cv=cv, scoring='accuracy', n_jobs=-1)
+    f1 = cross_val_score(model, X, y, cv=cv, scoring='f1_weighted', n_jobs=-1)
     results = {
         'mean_accuracy': round(float(acc.mean()), 4),
-        'std_accuracy':  round(float(acc.std()),  4),
-        'mean_f1':       round(float(f1.mean()),  4),
-        'std_f1':        round(float(f1.std()),   4),
+        'std_accuracy': round(float(acc.std()), 4),
+        'mean_f1': round(float(f1.mean()), 4),
+        'std_f1': round(float(f1.std()), 4),
     }
     logger.info(
         "CV — acc=%.4f±%.4f  f1=%.4f±%.4f",
         results['mean_accuracy'], results['std_accuracy'],
-        results['mean_f1'],       results['std_f1'],
+        results['mean_f1'], results['std_f1'],
     )
     return results
 

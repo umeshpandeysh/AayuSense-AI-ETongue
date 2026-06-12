@@ -52,8 +52,8 @@ class RandomForestModel:
             self (enables method chaining).
         """
         param_grid = {
-            'n_estimators':    self.config.rf_n_estimators_range,
-            'max_depth':       self.config.rf_max_depth_range,
+            'n_estimators': self.config.rf_n_estimators_range,
+            'max_depth': self.config.rf_max_depth_range,
             'min_samples_split': self.config.rf_min_samples_split,
         }
         logger.info("GridSearchCV for RandomForest — param_grid: %s", param_grid)

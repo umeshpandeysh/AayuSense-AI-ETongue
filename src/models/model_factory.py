@@ -28,9 +28,9 @@ def get_model(
     """
     registry = {
         'random_forest': RandomForestModel,
-        'rf':            RandomForestModel,
-        'xgboost':       XGBoostModel,
-        'xgb':           XGBoostModel,
+        'rf': RandomForestModel,
+        'xgboost': XGBoostModel,
+        'xgb': XGBoostModel,
     }
     key = model_type.strip().lower()
     if key not in registry:
