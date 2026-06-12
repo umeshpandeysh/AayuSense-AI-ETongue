@@ -11,7 +11,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from src.esp32_interface import ESP32DataParser, SensorReading, SENSOR_RANGES
+from src.esp32_interface import ESP32DataParser, SensorReading, SENSOR_RANGES  # noqa: E402
 
 
 def _valid_payload(**overrides) -> str:

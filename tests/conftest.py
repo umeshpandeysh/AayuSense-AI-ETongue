@@ -12,7 +12,7 @@ import pytest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 
-from src.feature_engineering import SENSOR_COLUMNS
+from src.feature_engineering import SENSOR_COLUMNS  # noqa: E402
 
 
 @pytest.fixture()

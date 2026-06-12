@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from src.data_pipeline import (
+from src.data_pipeline import (  # noqa: E402
     load_raw_data,
     validate_schema,
     handle_missing_values,
@@ -29,15 +29,15 @@ def _make_valid_csv(n: int = 20) -> str:
     """Write a minimal valid sensor CSV to a temp file and return its path."""
     rng = np.random.default_rng(42)
     data = {
-        'pH':              rng.uniform(5.5, 7.5, n),
-        'TDS':             rng.uniform(100, 400, n),
-        'orp_mV':          rng.uniform(200, 400, n),
-        'turbidity':       rng.uniform(0.05, 0.4, n),
+        'pH': rng.uniform(5.5, 7.5, n),
+        'TDS': rng.uniform(100, 400, n),
+        'orp_mV': rng.uniform(200, 400, n),
+        'turbidity': rng.uniform(0.05, 0.4, n),
         'Reduction_value': rng.uniform(0.05, 0.3, n),
-        'Ionic_value':     rng.uniform(0.04, 0.2, n),
-        'Salt_content':    rng.uniform(0.1, 0.35, n),
-        'temp_c':          rng.uniform(24.0, 27.0, n),
-        'quality_label':   ['Genuine'] * n,
+        'Ionic_value': rng.uniform(0.04, 0.2, n),
+        'Salt_content': rng.uniform(0.1, 0.35, n),
+        'temp_c': rng.uniform(24.0, 27.0, n),
+        'quality_label': ['Genuine'] * n,
     }
     df = pd.DataFrame(data)
     with tempfile.NamedTemporaryFile(
@@ -111,14 +111,14 @@ class TestRemoveOutliers(unittest.TestCase):
         ph_vals = list(normal_vals) + [9999.0]  # extreme outlier
         n = len(ph_vals)
         df = pd.DataFrame({
-            'pH':              ph_vals,
-            'TDS':             rng.uniform(150, 300, n),
-            'orp_mV':          rng.uniform(250, 380, n),
-            'turbidity':       rng.uniform(0.05, 0.3, n),
+            'pH': ph_vals,
+            'TDS': rng.uniform(150, 300, n),
+            'orp_mV': rng.uniform(250, 380, n),
+            'turbidity': rng.uniform(0.05, 0.3, n),
             'Reduction_value': rng.uniform(0.05, 0.25, n),
-            'Ionic_value':     rng.uniform(0.04, 0.18, n),
-            'Salt_content':    rng.uniform(0.1, 0.3, n),
-            'temp_c':          rng.uniform(24.0, 27.0, n),
+            'Ionic_value': rng.uniform(0.04, 0.18, n),
+            'Salt_content': rng.uniform(0.1, 0.3, n),
+            'temp_c': rng.uniform(24.0, 27.0, n),
         })
         result = remove_outliers(df, z_threshold=3.0)
         self.assertLess(len(result), len(df))

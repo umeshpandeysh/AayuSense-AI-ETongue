@@ -13,7 +13,7 @@ import pandas as pd
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from src.feature_engineering import (
+from src.feature_engineering import (  # noqa: E402
     compute_rolling_statistics,
     compute_range_features,
     compute_gradient_features,
@@ -29,15 +29,15 @@ def _make_sensor_df(n: int = 15) -> pd.DataFrame:
     """Return a minimal 8-sensor DataFrame for testing."""
     rng = np.random.default_rng(42)
     return pd.DataFrame({
-        'pH':              rng.uniform(5.5, 7.5, n),
-        'TDS':             rng.uniform(0.2, 0.8, n),      # normalised [0,1]
-        'orp_mV':          rng.uniform(0.3, 0.9, n),
-        'turbidity':       rng.uniform(0.05, 0.4, n),
+        'pH': rng.uniform(5.5, 7.5, n),
+        'TDS': rng.uniform(0.2, 0.8, n),      # normalised [0,1]
+        'orp_mV': rng.uniform(0.3, 0.9, n),
+        'turbidity': rng.uniform(0.05, 0.4, n),
         'Reduction_value': rng.uniform(0.05, 0.3, n),
-        'Ionic_value':     rng.uniform(0.04, 0.2, n),
-        'Salt_content':    rng.uniform(0.1, 0.35, n),
-        'temp_c':          rng.uniform(0.4, 0.7, n),      # normalised
-        'quality_label':   ['Genuine'] * n,
+        'Ionic_value': rng.uniform(0.04, 0.2, n),
+        'Salt_content': rng.uniform(0.1, 0.35, n),
+        'temp_c': rng.uniform(0.4, 0.7, n),      # normalised
+        'quality_label': ['Genuine'] * n,
     })
 
 
@@ -47,7 +47,7 @@ class TestComputeRollingStatistics(unittest.TestCase):
         result = compute_rolling_statistics(df, window=3)
         for col in SENSOR_COLUMNS:
             self.assertIn(f'{col}_mean', result.columns, f'Missing {col}_mean')
-            self.assertIn(f'{col}_std',  result.columns, f'Missing {col}_std')
+            self.assertIn(f'{col}_std', result.columns, f'Missing {col}_std')
 
     def test_no_rows_dropped(self):
         df = _make_sensor_df(10)

@@ -141,7 +141,7 @@ def plot_cv_scores(
     """
     model_names = list(cv_scores_dict.keys())
     means = [np.mean(s) for s in cv_scores_dict.values()]
-    stds  = [np.std(s)  for s in cv_scores_dict.values()]
+    stds = [np.std(s) for s in cv_scores_dict.values()]
 
     x = np.arange(len(model_names))
     fig, ax = plt.subplots(figsize=(max(6, len(model_names) * 2), 5))
